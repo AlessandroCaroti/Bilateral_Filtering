@@ -90,3 +90,43 @@ for i, sigma_d in enumerate(sigma_d_list):
 
 cv2.imwrite(os.path.join(save_dir, 'collage.jpg'), img_collage)
 '''
+
+'''
+Put the iteration number on the image and create a video with the sequence of the iterations
+
+from PIL import Image, ImageFont, ImageDraw, ImageOps
+import glob
+dir_path = r".\pictures\paine_it"
+save_path = os.path.join(dir_path, 'label')
+if not os.path.exists(save_path):
+    os.mkdir(save_path)
+
+frames = []
+b_border, w_border = 5, 50
+for i,filename in enumerate(glob.glob(dir_path+"\*.jpg")):
+    img = Image.open(filename)
+    img = ImageOps.expand(img, border=(0, w_border, 0, 0), fill='white')
+    img = ImageOps.expand(img, border=(b_border, b_border, b_border, b_border), fill='black')
+    W, H = img.size
+    
+    text = "Iteration "+str(i+1)
+    
+    im = Image.new("RGBA",(W,H),"yellow")
+    draw = ImageDraw.Draw(im)
+    w, h = draw.textsize(text)
+    
+    font = ImageFont.truetype("C:\\Windows\\Fonts\\Georgia.ttf", 36)
+    image_editable = ImageDraw.Draw(img)
+    image_editable.text(((W-w)/2,8), text, (0, 0, 0), font=font)
+    
+    frames.append(img)
+    img.save(os.path.join(save_path, "it_{:03d}.jpg").format(i))
+
+fourcc = cv2.VideoWriter_fourcc(*'H264')
+out = cv2.VideoWriter('.\\pictures\\output_video.mp4',fourcc, 20.0, (W, H))
+for filename in glob.glob(save_path+'//*.jpg'):
+    img = cv2.imread(filename)
+    for _ in range(20):
+        out.write(img)
+out.release()
+'''
